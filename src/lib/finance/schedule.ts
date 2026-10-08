@@ -1,5 +1,5 @@
 import { monthlyPayment, monthsToRepay } from "./annuity"
-import { EARLY_REPAYMENT_FEE_PCT, STAMP_DUTY } from "./rules"
+import { STAMP_DUTY } from "./rules"
 import type { Market, Offer, RepaymentRule } from "./types"
 
 const EPSILON = 0.005
@@ -59,7 +59,6 @@ export function ruleDueInYear(rule: RepaymentRule, year: number): boolean {
 
 export interface ScheduleOptions {
   repayments?: RepaymentRule[]
-  repaymentFeeWaived?: boolean
 }
 
 /**
@@ -106,10 +105,8 @@ export function buildSchedule(
       balance -= extra
       extraPaid += extra
       lastRepaymentMonth = m
-      if (!options.repaymentFeeWaived) {
-        const feePct = isFixedAt(offer, m) ? EARLY_REPAYMENT_FEE_PCT.fixed : EARLY_REPAYMENT_FEE_PCT.variable
-        repaymentFees += ((extra * feePct) / 100) * (1 + STAMP_DUTY.onInterestRate)
-      }
+      const feePct = isFixedAt(offer, m) ? offer.repaymentFeeFixedPct : offer.repaymentFeeVariablePct
+      repaymentFees += ((extra * feePct) / 100) * (1 + STAMP_DUTY.onInterestRate)
       if (balance <= EPSILON) break
       if (rule.mode === "term") {
         end = Math.min(m + 1 + monthsToRepay(rate, balance, payment), months)

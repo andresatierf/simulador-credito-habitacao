@@ -42,7 +42,6 @@ export function suggestRepaymentPlan(
   const scheduleFor = (rules: PlannedRule[]) =>
     buildSchedule(offer, loan, months, scenario.market, {
       repayments: rules.map((r, i) => ({ ...r, id: String(i) })),
-      repaymentFeeWaived: scenario.repaymentFeeWaived,
     })
 
   for (let switchYear = fromYear; switchYear <= lastYear; switchYear++) {

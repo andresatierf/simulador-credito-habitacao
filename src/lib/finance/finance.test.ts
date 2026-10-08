@@ -18,7 +18,7 @@ const LOAN = 350_000
 const MONTHS = 480
 const fixed345 = newOffer("fixed 3.45", { type: "fixed", fixedRatePct: 3.45 })
 const variable060 = newOffer("E6M + 0.60", { type: "variable", spreadPct: 0.6, promoSpreadPct: 0.6 })
-const noFees = { repaymentFeeWaived: true }
+const fixed345NoFee = { ...fixed345, repaymentFeeFixedPct: 0, repaymentFeeVariablePct: 0 }
 
 describe("monthlyPayment", () => {
   it.each([
@@ -122,8 +122,7 @@ describe("schedule with early repayments", () => {
   })
 
   it("€10k after year 1, shorten term: 27 months sooner, ~€26.6k less interest", () => {
-    const s = buildSchedule(fixed345, LOAN, MONTHS, market, {
-      ...noFees,
+    const s = buildSchedule(fixed345NoFee, LOAN, MONTHS, market, {
       repayments: [newRepayment({ amount: 10_000, fromYear: 1, mode: "term" })],
     })
     expect(MONTHS - s.paidOffMonths).toBe(27)
@@ -131,8 +130,7 @@ describe("schedule with early repayments", () => {
   })
 
   it("€10k after year 1, lower payment: €1,306/month, ~€8.2k less interest", () => {
-    const s = buildSchedule(fixed345, LOAN, MONTHS, market, {
-      ...noFees,
+    const s = buildSchedule(fixed345NoFee, LOAN, MONTHS, market, {
       repayments: [newRepayment({ amount: 10_000, fromYear: 1, mode: "payment" })],
     })
     expect(s.paidOffMonths).toBe(MONTHS)
@@ -141,8 +139,7 @@ describe("schedule with early repayments", () => {
   })
 
   it("repeats every N years within the range", () => {
-    const s = buildSchedule(fixed345, LOAN, MONTHS, market, {
-      ...noFees,
+    const s = buildSchedule(fixed345NoFee, LOAN, MONTHS, market, {
       repayments: [newRepayment({ amount: 10_000, repeats: true, everyYears: 5, fromYear: 5, untilYear: 40 })],
     })
     expect(s.extraPaid).toBe(60_000)
@@ -155,6 +152,13 @@ describe("schedule with early repayments", () => {
     const mixed = newOffer("mixed", { type: "mixed", fixedRatePct: 2.8, fixedYears: 4 })
     const late = [newRepayment({ amount: 10_000, fromYear: 5 })]
     expect(buildSchedule(mixed, LOAN, MONTHS, market, { repayments: late }).repaymentFees).toBeCloseTo(52, 6)
+  })
+
+  it("uses each offer's own fee, including a waived one", () => {
+    const rule = [newRepayment({ amount: 10_000, fromYear: 1 })]
+    const lower = { ...fixed345, repaymentFeeFixedPct: 1 }
+    expect(buildSchedule(lower, LOAN, MONTHS, market, { repayments: rule }).repaymentFees).toBeCloseTo(104, 6)
+    expect(buildSchedule(fixed345NoFee, LOAN, MONTHS, market, { repayments: rule }).repaymentFees).toBe(0)
   })
 
   it("ignores hidden repayments", () => {
@@ -291,5 +295,26 @@ describe("net worth at the start", () => {
     const { wealth } = evaluateScenario(scenario)
     expect(wealth.cashAfterSigning).toBeLessThan(0)
     expect(wealth.reserveMonths).toBe(0)
+  })
+})
+
+describe("scenario links and saved data", () => {
+  it("gives offers from before per-offer fees the legal maximum, or 0% when the fee was waived", async () => {
+    const { parseScenario } = await import("@/lib/scenario/codec")
+    const legacy = (waived: boolean) => {
+      const s = defaultScenario() as unknown as Record<string, unknown>
+      s.offers = (s.offers as Array<Record<string, unknown>>).map((o) => {
+        const copy = { ...o }
+        delete copy.repaymentFeeFixedPct
+        delete copy.repaymentFeeVariablePct
+        return copy
+      })
+      s.repaymentFeeWaived = waived
+      return s
+    }
+    const charged = parseScenario(legacy(false))!
+    expect(charged.offers[0]).toMatchObject({ repaymentFeeFixedPct: 2, repaymentFeeVariablePct: 0.5 })
+    const waived = parseScenario(legacy(true))!
+    expect(waived.offers[0]).toMatchObject({ repaymentFeeFixedPct: 0, repaymentFeeVariablePct: 0 })
   })
 })

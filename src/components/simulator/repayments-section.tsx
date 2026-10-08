@@ -214,9 +214,6 @@ export const RepaymentsSection = withForm({
               </FieldSet>
 
               <FieldGroup className="flex flex-row flex-wrap gap-x-8 gap-y-3">
-                <form.AppField name="repaymentFeeWaived">
-                  {(f) => <f.SwitchField label="Bank waives the repayment fee" className="w-auto" />}
-                </form.AppField>
                 <Field orientation="horizontal" className="w-auto">
                   <FieldLabel htmlFor="show-repayments-in-chart">Show repayments in the chart</FieldLabel>
                   <Switch id="show-repayments-in-chart" checked={showInChart} onCheckedChange={setShowInChart} />
@@ -226,9 +223,9 @@ export const RepaymentsSection = withForm({
               <RepaymentResults result={result} comfortPct={comfortPct} />
             </CardContent>
             <CardFooter className="text-xs text-muted-foreground">
-              Repayments are made at the end of each chosen year and applied top to bottom. Maximum fee: 2% while the
-              rate is fixed, 0.5% while it's variable, plus 4% stamp duty on the fee. The variable-rate fee waiver ended
-              on 31 Dec 2025.
+              Repayments are made at the end of each chosen year and applied top to bottom. Each offer's repayment fee is
+              set in Bank offers (legal maximum: 2% while the rate is fixed, 0.5% while it's variable), plus 4% stamp
+              duty on the fee.
             </CardFooter>
           </Card>
         )}

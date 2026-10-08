@@ -1,5 +1,7 @@
 import { z } from "zod"
 
+import { EARLY_REPAYMENT_FEE_PCT } from "@/lib/finance/rules"
+
 const amount = () =>
   z.number({ error: "Enter a number" }).min(0, { error: "Must be 0 or more" })
 const between = (min: number, max: number) =>
@@ -33,6 +35,8 @@ export const offerSchema = z.object({
   promoYears: between(0, 40),
   insuranceMonthly: amount(),
   feesOneOff: amount(),
+  repaymentFeeFixedPct: between(0, EARLY_REPAYMENT_FEE_PCT.fixed),
+  repaymentFeeVariablePct: between(0, EARLY_REPAYMENT_FEE_PCT.variable),
   enabled: z.boolean(),
 })
 
@@ -73,7 +77,6 @@ export const scenarioSchema = z.object({
   }),
   offers: z.array(offerSchema),
   repayments: z.array(repaymentSchema),
-  repaymentFeeWaived: z.boolean(),
   comfortPct: between(5, 80),
   wealth: z.object({
     cash: amount(),

@@ -47,7 +47,7 @@ export const STAMP_DUTY = {
   onInterestRate: 0.04,
 } as const
 
-/** Decreto-Lei 74-A/2017: maximum early repayment fee. */
+/** Decreto-Lei 74-A/2017: maximum early repayment fee. Banks may charge less or waive it; each offer sets its own. */
 export const EARLY_REPAYMENT_FEE_PCT = {
   fixed: 2,
   variable: 0.5,

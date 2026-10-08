@@ -5,6 +5,8 @@ import { scenarioFormOptions, withForm } from "@/components/form/form"
 import { Button } from "@/components/ui/button"
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { FieldGroup } from "@/components/ui/field"
+import { pct } from "@/lib/format"
+import { EARLY_REPAYMENT_FEE_PCT } from "@/lib/finance/rules"
 import { newId, newOffer } from "@/lib/scenario/defaults"
 
 import { ListItem } from "./list-item"
@@ -109,6 +111,34 @@ export const OffersSection = withForm({
                         <form.AppField name={`offers[${i}].feesOneOff`}>
                           {(f) => <f.NumberField label="Bank fees (one-off)" unit="€" step={50} min={0} />}
                         </form.AppField>
+                        {offer.type !== "variable" && (
+                          <form.AppField name={`offers[${i}].repaymentFeeFixedPct`}>
+                            {(f) => (
+                              <f.NumberField
+                                label={offer.type === "mixed" ? "Repayment fee, fixed period" : "Repayment fee"}
+                                description={`Max ${pct(EARLY_REPAYMENT_FEE_PCT.fixed, 0)}`}
+                                unit="%"
+                                step={0.25}
+                                min={0}
+                                max={EARLY_REPAYMENT_FEE_PCT.fixed}
+                              />
+                            )}
+                          </form.AppField>
+                        )}
+                        {offer.type !== "fixed" && (
+                          <form.AppField name={`offers[${i}].repaymentFeeVariablePct`}>
+                            {(f) => (
+                              <f.NumberField
+                                label={offer.type === "mixed" ? "Repayment fee, after" : "Repayment fee"}
+                                description={`Max ${pct(EARLY_REPAYMENT_FEE_PCT.variable, 1)}`}
+                                unit="%"
+                                step={0.1}
+                                min={0}
+                                max={EARLY_REPAYMENT_FEE_PCT.variable}
+                              />
+                            )}
+                          </form.AppField>
+                        )}
                       </FieldGroup>
                 </ListItem>
               ))}

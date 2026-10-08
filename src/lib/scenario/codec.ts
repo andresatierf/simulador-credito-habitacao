@@ -1,5 +1,6 @@
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from "lz-string"
 
+import { EARLY_REPAYMENT_FEE_PCT } from "@/lib/finance/rules"
 import type { Scenario } from "@/lib/finance/types"
 
 import { defaultScenario, newId } from "./defaults"
@@ -21,6 +22,14 @@ function migrate(raw: unknown): unknown {
     property: { ...base.property, ...(s.property as object) },
     market: { ...base.market, ...(s.market as object) },
     wealth: { ...base.wealth, ...(s.wealth as object) },
+    // Before per-offer fees there was one switch; a waived fee becomes 0% on every offer.
+    offers: Array.isArray(s.offers)
+      ? (s.offers as Array<Record<string, unknown>>).map((o) => ({
+          repaymentFeeFixedPct: s.repaymentFeeWaived ? 0 : EARLY_REPAYMENT_FEE_PCT.fixed,
+          repaymentFeeVariablePct: s.repaymentFeeWaived ? 0 : EARLY_REPAYMENT_FEE_PCT.variable,
+          ...o,
+        }))
+      : s.offers,
   }
 }
 

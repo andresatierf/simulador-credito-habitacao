@@ -102,7 +102,6 @@ export function evaluateScenario(scenario: Scenario): ScenarioResult {
     const dstiPct = income > 0 ? ((stressed + otherDebtMonthly) / income) * 100 : Number.POSITIVE_INFINITY
     const withRepaymentsSchedule = buildSchedule(offer, loan, months, market, {
       repayments: scenario.repayments,
-      repaymentFeeWaived: scenario.repaymentFeeWaived,
     })
     const stampedInterest = 1 + STAMP_DUTY.onInterestRate
     return {

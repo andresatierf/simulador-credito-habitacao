@@ -38,6 +38,10 @@ export interface Offer {
   insuranceMonthly: number
   /** One-off bank fees (dossier, valuation, formalities). */
   feesOneOff: number
+  /** Early repayment fee while the rate is fixed (fixed offers, fixed period of mixed offers), in percent. Legal max 2%. */
+  repaymentFeeFixedPct: number
+  /** Early repayment fee while the rate is variable, in percent. Legal max 0.5%. */
+  repaymentFeeVariablePct: number
   enabled: boolean
 }
 
@@ -98,7 +102,6 @@ export interface Scenario {
   market: Market
   offers: Offer[]
   repayments: RepaymentRule[]
-  repaymentFeeWaived: boolean
   /** Payment share of income considered comfortable, used for the switch check. */
   comfortPct: number
   /** What the household owns and owes before buying. */

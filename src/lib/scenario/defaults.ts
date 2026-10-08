@@ -1,3 +1,4 @@
+import { EARLY_REPAYMENT_FEE_PCT } from "@/lib/finance/rules"
 import type { Borrower, Offer, RepaymentRule, Scenario } from "@/lib/finance/types"
 
 export function newId(): string {
@@ -31,6 +32,8 @@ export function newOffer(name: string, overrides: Partial<Offer> = {}): Offer {
     promoYears: 0,
     insuranceMonthly: 60,
     feesOneOff: 1000,
+    repaymentFeeFixedPct: EARLY_REPAYMENT_FEE_PCT.fixed,
+    repaymentFeeVariablePct: EARLY_REPAYMENT_FEE_PCT.variable,
     enabled: true,
     ...overrides,
   }
@@ -89,7 +92,6 @@ export function defaultScenario(): Scenario {
       newRepayment({ amount: 3000, repeats: true, fromYear: 2, untilYear: 5, mode: "payment" }),
       newRepayment({ amount: 5000, repeats: true, fromYear: 6, untilYear: 40, mode: "term" }),
     ],
-    repaymentFeeWaived: false,
     comfortPct: 35,
     wealth: { cash: 20_000, investments: 0, debtBalance: 0 },
   }
