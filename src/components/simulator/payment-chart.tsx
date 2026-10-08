@@ -75,9 +75,12 @@ export function PaymentChart({
       hi = Math.max(hi, s.payments[m])
     }
   }
-  const step = niceStep(Math.max(hi - lo, 100), 5)
-  const y0 = Math.max(Math.floor((lo * 0.95) / step) * step, 0)
-  const y1 = Math.ceil((hi * 1.03) / step) * step
+  // Pad by a small share of the data range (not of the values) so the lines fill the plot.
+  const range = Math.max(hi - lo, 100)
+  const step = niceStep(range, 5)
+  const pad = range * 0.04
+  const y0 = Math.max(Math.floor((lo - pad) / step) * step, 0)
+  const y1 = Math.ceil((hi + pad) / step) * step
   const x = (m: number) => MARGIN.left + (m / N) * innerW
   const y = (v: number) => MARGIN.top + innerH - ((v - y0) / (y1 - y0)) * innerH
   const yTicks: number[] = []
