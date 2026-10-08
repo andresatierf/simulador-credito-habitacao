@@ -1,40 +1,33 @@
-import { useStore } from "@tanstack/react-form"
-import { PlusIcon } from "lucide-react"
+import { useStore } from "@tanstack/react-form";
+import { PlusIcon } from "lucide-react";
 
-import { scenarioFormOptions, withForm } from "@/components/form/form"
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { FieldGroup } from "@/components/ui/field"
-import { pct } from "@/lib/format"
-import { EARLY_REPAYMENT_FEE_PCT } from "@/lib/finance/rules"
-import { newId, newOffer } from "@/lib/scenario/defaults"
+import { scenarioFormOptions, withForm } from "@/components/form/form";
+import { Button } from "@/components/ui/button";
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { FieldGroup } from "@/components/ui/field";
+import { pct } from "@/lib/format";
+import { EARLY_REPAYMENT_FEE_PCT } from "@/lib/finance/rules";
+import { newId, newOffer } from "@/lib/scenario/defaults";
 
-import { ListItem } from "./list-item"
-import { SeriesKey } from "./series"
+import { ListItem } from "./list-item";
+import { SeriesKey } from "./series";
 
-export const MAX_OFFERS = 8
+export const MAX_OFFERS = 8;
 
 const TYPE_OPTIONS = [
   { value: "fixed" as const, label: "Fixed" },
   { value: "variable" as const, label: "Variable" },
   { value: "mixed" as const, label: "Mixed" },
-]
+];
 const INDEX_OPTIONS = [
   { value: "6m" as const, label: "Euribor 6M" },
   { value: "12m" as const, label: "Euribor 12M" },
-]
+];
 
 export const OffersSection = withForm({
   ...scenarioFormOptions,
   render: function OffersSection({ form }) {
-    const offers = useStore(form.store, (s) => s.values.offers)
+    const offers = useStore(form.store, (s) => s.values.offers);
     return (
       <form.Field name="offers" mode="array">
         {(list) => (
@@ -44,15 +37,12 @@ export const OffersSection = withForm({
                 <h2>Bank offers</h2>
               </CardTitle>
               <CardDescription>
-                The starting offers are indicative public rates from July–August
-                2026, mostly quoted at 80% LTV. Replace them with the figures
-                from each bank's FINE.
+                The starting offers are indicative public rates from July–August 2026, mostly quoted at 80% LTV. Replace
+                them with the figures from each bank's FINE.
               </CardDescription>
               <CardAction>
                 <Button
-                  onClick={() =>
-                    list.pushValue(newOffer(`Offer ${offers.length + 1}`))
-                  }
+                  onClick={() => list.pushValue(newOffer(`Offer ${offers.length + 1}`))}
                   disabled={offers.length >= MAX_OFFERS}
                 >
                   <PlusIcon data-icon="inline-start" />
@@ -66,9 +56,7 @@ export const OffersSection = withForm({
                   key={offer.id}
                   noun="offer"
                   enabled={offer.enabled}
-                  onToggle={() =>
-                    form.setFieldValue(`offers[${i}].enabled`, (v) => !v)
-                  }
+                  onToggle={() => form.setFieldValue(`offers[${i}].enabled`, (v) => !v)}
                   onCopy={() =>
                     list.insertValue(i + 1, {
                       ...offer,
@@ -88,35 +76,17 @@ export const OffersSection = withForm({
                   }
                 >
                   <form.AppField name={`offers[${i}].type`}>
-                    {(f) => (
-                      <f.ToggleGroupField
-                        label="Rate type"
-                        options={TYPE_OPTIONS}
-                      />
-                    )}
+                    {(f) => <f.ToggleGroupField label="Rate type" options={TYPE_OPTIONS} />}
                   </form.AppField>
                   <FieldGroup className="grid grid-cols-2 gap-3">
                     {offer.type !== "variable" && (
                       <form.AppField name={`offers[${i}].fixedRatePct`}>
-                        {(f) => (
-                          <f.NumberField
-                            label="Fixed rate (TAN)"
-                            unit="%"
-                            step={0.05}
-                          />
-                        )}
+                        {(f) => <f.NumberField label="Fixed rate (TAN)" unit="%" step={0.05} />}
                       </form.AppField>
                     )}
                     {offer.type === "mixed" && (
                       <form.AppField name={`offers[${i}].fixedYears`}>
-                        {(f) => (
-                          <f.NumberField
-                            label="Fixed period"
-                            unit="years"
-                            min={0}
-                            max={40}
-                          />
-                        )}
+                        {(f) => <f.NumberField label="Fixed period" unit="years" min={0} max={40} />}
                       </form.AppField>
                     )}
                     {offer.type !== "fixed" && (
@@ -124,9 +94,7 @@ export const OffersSection = withForm({
                         <form.AppField name={`offers[${i}].index`}>
                           {(f) => (
                             <f.SelectField
-                              label={
-                                offer.type === "mixed" ? "Then index" : "Index"
-                              }
+                              label={offer.type === "mixed" ? "Then index" : "Index"}
                               options={INDEX_OPTIONS}
                             />
                           )}
@@ -134,11 +102,7 @@ export const OffersSection = withForm({
                         <form.AppField name={`offers[${i}].spreadPct`}>
                           {(f) => (
                             <f.NumberField
-                              label={
-                                offer.type === "mixed"
-                                  ? "Then spread"
-                                  : "Spread"
-                              }
+                              label={offer.type === "mixed" ? "Then spread" : "Spread"}
                               unit="%"
                               step={0.05}
                             />
@@ -149,55 +113,24 @@ export const OffersSection = withForm({
                     {offer.type === "variable" && (
                       <>
                         <form.AppField name={`offers[${i}].promoSpreadPct`}>
-                          {(f) => (
-                            <f.NumberField
-                              label="Promo spread"
-                              unit="%"
-                              step={0.05}
-                            />
-                          )}
+                          {(f) => <f.NumberField label="Promo spread" unit="%" step={0.05} />}
                         </form.AppField>
                         <form.AppField name={`offers[${i}].promoYears`}>
-                          {(f) => (
-                            <f.NumberField
-                              label="Promo period"
-                              unit="years"
-                              min={0}
-                              max={40}
-                            />
-                          )}
+                          {(f) => <f.NumberField label="Promo period" unit="years" min={0} max={40} />}
                         </form.AppField>
                       </>
                     )}
                     <form.AppField name={`offers[${i}].insuranceMonthly`}>
-                      {(f) => (
-                        <f.NumberField
-                          label="Insurance (life + home)"
-                          unit="€/mo"
-                          step={5}
-                          min={0}
-                        />
-                      )}
+                      {(f) => <f.NumberField label="Insurance (life + home)" unit="€/mo" step={5} min={0} />}
                     </form.AppField>
                     <form.AppField name={`offers[${i}].feesOneOff`}>
-                      {(f) => (
-                        <f.NumberField
-                          label="Bank fees (one-off)"
-                          unit="€"
-                          step={50}
-                          min={0}
-                        />
-                      )}
+                      {(f) => <f.NumberField label="Bank fees (one-off)" unit="€" step={50} min={0} />}
                     </form.AppField>
                     {offer.type !== "variable" && (
                       <form.AppField name={`offers[${i}].repaymentFeeFixedPct`}>
                         {(f) => (
                           <f.NumberField
-                            label={
-                              offer.type === "mixed"
-                                ? "Repayment fee, fixed period"
-                                : "Repayment fee"
-                            }
+                            label={offer.type === "mixed" ? "Repayment fee, fixed period" : "Repayment fee"}
                             description={`Max ${pct(EARLY_REPAYMENT_FEE_PCT.fixed, 0)}`}
                             unit="%"
                             step={0.25}
@@ -208,16 +141,10 @@ export const OffersSection = withForm({
                       </form.AppField>
                     )}
                     {offer.type !== "fixed" && (
-                      <form.AppField
-                        name={`offers[${i}].repaymentFeeVariablePct`}
-                      >
+                      <form.AppField name={`offers[${i}].repaymentFeeVariablePct`}>
                         {(f) => (
                           <f.NumberField
-                            label={
-                              offer.type === "mixed"
-                                ? "Repayment fee, after"
-                                : "Repayment fee"
-                            }
+                            label={offer.type === "mixed" ? "Repayment fee, after" : "Repayment fee"}
                             description={`Max ${pct(EARLY_REPAYMENT_FEE_PCT.variable, 1)}`}
                             unit="%"
                             step={0.1}
@@ -234,6 +161,6 @@ export const OffersSection = withForm({
           </Card>
         )}
       </form.Field>
-    )
+    );
   },
-})
+});

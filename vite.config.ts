@@ -1,9 +1,9 @@
 /// <reference types="vitest/config" />
-import { resolve } from "node:path"
-import tailwindcss from "@tailwindcss/vite"
-import react from "@vitejs/plugin-react"
-import { defineConfig } from "vite"
-import { VitePWA } from "vite-plugin-pwa"
+import { resolve } from "node:path";
+import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
+import { VitePWA } from "vite-plugin-pwa";
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -18,8 +18,7 @@ export default defineConfig({
       manifest: {
         name: "Simulador Crédito Habitação",
         short_name: "Crédito Habitação",
-        description:
-          "Compare Portuguese mortgage offers against the bank affordability test.",
+        description: "Compare Portuguese mortgage offers against the bank affordability test.",
         theme_color: "#1f4fa8",
         background_color: "#f3f5f9",
         display: "standalone",
@@ -37,4 +36,4 @@ export default defineConfig({
   test: {
     environment: "node",
   },
-})
+});

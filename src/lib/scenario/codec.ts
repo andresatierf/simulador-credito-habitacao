@@ -1,24 +1,21 @@
-import {
-  compressToEncodedURIComponent,
-  decompressFromEncodedURIComponent,
-} from "lz-string"
+import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from "lz-string";
 
-import { EARLY_REPAYMENT_FEE_PCT } from "@/lib/finance/rules"
-import type { Scenario } from "@/lib/finance/types"
+import { EARLY_REPAYMENT_FEE_PCT } from "@/lib/finance/rules";
+import type { Scenario } from "@/lib/finance/types";
 
-import { defaultScenario, newId } from "./defaults"
-import { scenarioSchema } from "./schema"
+import { defaultScenario, newId } from "./defaults";
+import { scenarioSchema } from "./schema";
 
 /** Bump when the stored shape changes in a way `migrate` must handle. */
-const VERSION = 1
+const VERSION = 1;
 
-type Envelope = { v: number; s: unknown }
+type Envelope = { v: number; s: unknown };
 
 /** Fill in fields added after a scenario was saved, so old links and saved scenarios keep working. */
 function migrate(raw: unknown): unknown {
-  if (!raw || typeof raw !== "object") return raw
-  const base = defaultScenario()
-  const s = raw as Record<string, unknown>
+  if (!raw || typeof raw !== "object") return raw;
+  const base = defaultScenario();
+  const s = raw as Record<string, unknown>;
   return {
     ...base,
     ...s,
@@ -28,16 +25,12 @@ function migrate(raw: unknown): unknown {
     // Before per-offer fees there was one switch; a waived fee becomes 0% on every offer.
     offers: Array.isArray(s.offers)
       ? (s.offers as Array<Record<string, unknown>>).map((o) => ({
-          repaymentFeeFixedPct: s.repaymentFeeWaived
-            ? 0
-            : EARLY_REPAYMENT_FEE_PCT.fixed,
-          repaymentFeeVariablePct: s.repaymentFeeWaived
-            ? 0
-            : EARLY_REPAYMENT_FEE_PCT.variable,
+          repaymentFeeFixedPct: s.repaymentFeeWaived ? 0 : EARLY_REPAYMENT_FEE_PCT.fixed,
+          repaymentFeeVariablePct: s.repaymentFeeWaived ? 0 : EARLY_REPAYMENT_FEE_PCT.variable,
           ...o,
         }))
       : s.offers,
-  }
+  };
 }
 
 function withIds(s: Scenario): Scenario {
@@ -46,13 +39,13 @@ function withIds(s: Scenario): Scenario {
     borrowers: s.borrowers.map((b) => ({ ...b, id: b.id || newId() })),
     offers: s.offers.map((o) => ({ ...o, id: o.id || newId() })),
     repayments: s.repayments.map((r) => ({ ...r, id: r.id || newId() })),
-  }
+  };
 }
 
 function strip<T extends { id: string }>(item: T): Omit<T, "id"> {
-  const copy: Partial<T> = { ...item }
-  delete copy.id
-  return copy as Omit<T, "id">
+  const copy: Partial<T> = { ...item };
+  delete copy.id;
+  return copy as Omit<T, "id">;
 }
 
 function withoutIds(s: Scenario): unknown {
@@ -61,42 +54,36 @@ function withoutIds(s: Scenario): unknown {
     borrowers: s.borrowers.map(strip),
     offers: s.offers.map(strip),
     repayments: s.repayments.map(strip),
-  }
+  };
 }
 
 /** Parse untrusted scenario data (URL, storage). Returns null when it can't be used. */
 export function parseScenario(raw: unknown): Scenario | null {
-  const migrated = migrate(raw) as Record<string, unknown> | undefined
-  if (!migrated) return null
+  const migrated = migrate(raw) as Record<string, unknown> | undefined;
+  if (!migrated) return null;
   const withTempIds = {
     ...migrated,
-    borrowers: (
-      migrated.borrowers as Array<Record<string, unknown>> | undefined
-    )?.map((b) => ({ id: "", ...b })),
-    offers: (
-      migrated.offers as Array<Record<string, unknown>> | undefined
-    )?.map((o) => ({ id: "", ...o })),
-    repayments: (
-      migrated.repayments as Array<Record<string, unknown>> | undefined
-    )?.map((r) => ({ id: "", ...r })),
-  }
-  const result = scenarioSchema.safeParse(withTempIds)
-  return result.success ? withIds(result.data as Scenario) : null
+    borrowers: (migrated.borrowers as Array<Record<string, unknown>> | undefined)?.map((b) => ({ id: "", ...b })),
+    offers: (migrated.offers as Array<Record<string, unknown>> | undefined)?.map((o) => ({ id: "", ...o })),
+    repayments: (migrated.repayments as Array<Record<string, unknown>> | undefined)?.map((r) => ({ id: "", ...r })),
+  };
+  const result = scenarioSchema.safeParse(withTempIds);
+  return result.success ? withIds(result.data as Scenario) : null;
 }
 
 /** Compact, URL-safe encoding of a scenario. IDs are dropped and regenerated on decode. */
 export function encodeScenario(scenario: Scenario): string {
-  const envelope: Envelope = { v: VERSION, s: withoutIds(scenario) }
-  return compressToEncodedURIComponent(JSON.stringify(envelope))
+  const envelope: Envelope = { v: VERSION, s: withoutIds(scenario) };
+  return compressToEncodedURIComponent(JSON.stringify(envelope));
 }
 
 export function decodeScenario(encoded: string): Scenario | null {
   try {
-    const json = decompressFromEncodedURIComponent(encoded)
-    if (!json) return null
-    const envelope = JSON.parse(json) as Envelope
-    return parseScenario(envelope.s)
+    const json = decompressFromEncodedURIComponent(encoded);
+    if (!json) return null;
+    const envelope = JSON.parse(json) as Envelope;
+    return parseScenario(envelope.s);
   } catch {
-    return null
+    return null;
   }
 }

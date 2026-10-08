@@ -1,7 +1,7 @@
-import { createFormHook, formOptions } from "@tanstack/react-form"
+import { createFormHook, formOptions } from "@tanstack/react-form";
 
-import { defaultScenario } from "@/lib/scenario/defaults"
-import { scenarioSchema } from "@/lib/scenario/schema"
+import { defaultScenario } from "@/lib/scenario/defaults";
+import { scenarioSchema } from "@/lib/scenario/schema";
 
 import {
   BooleanToggleField,
@@ -12,8 +12,8 @@ import {
   SwitchField,
   TextField,
   ToggleGroupField,
-} from "./fields"
-import { fieldContext, formContext } from "./form-context"
+} from "./fields";
+import { fieldContext, formContext } from "./form-context";
 
 export const { useAppForm, withForm } = createFormHook({
   fieldContext,
@@ -29,10 +29,10 @@ export const { useAppForm, withForm } = createFormHook({
     ToggleGroupField,
   },
   formComponents: {},
-})
+});
 
 /** Shared options so sections built with `withForm` are typed against the scenario. */
 export const scenarioFormOptions = formOptions({
   defaultValues: defaultScenario(),
   validators: { onChange: scenarioSchema },
-})
+});

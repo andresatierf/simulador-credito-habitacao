@@ -1,19 +1,11 @@
-import { EARLY_REPAYMENT_FEE_PCT } from "@/lib/finance/rules"
-import type {
-  Borrower,
-  Offer,
-  RepaymentRule,
-  Scenario,
-} from "@/lib/finance/types"
+import { EARLY_REPAYMENT_FEE_PCT } from "@/lib/finance/rules";
+import type { Borrower, Offer, RepaymentRule, Scenario } from "@/lib/finance/types";
 
 export function newId(): string {
-  return crypto.randomUUID()
+  return crypto.randomUUID();
 }
 
-export function newBorrower(
-  name: string,
-  overrides: Partial<Borrower> = {}
-): Borrower {
+export function newBorrower(name: string, overrides: Partial<Borrower> = {}): Borrower {
   return {
     id: newId(),
     name,
@@ -24,7 +16,7 @@ export function newBorrower(
     raisePct: 2,
     enabled: true,
     ...overrides,
-  }
+  };
 }
 
 export function newOffer(name: string, overrides: Partial<Offer> = {}): Offer {
@@ -44,12 +36,10 @@ export function newOffer(name: string, overrides: Partial<Offer> = {}): Offer {
     repaymentFeeVariablePct: EARLY_REPAYMENT_FEE_PCT.variable,
     enabled: true,
     ...overrides,
-  }
+  };
 }
 
-export function newRepayment(
-  overrides: Partial<RepaymentRule> = {}
-): RepaymentRule {
+export function newRepayment(overrides: Partial<RepaymentRule> = {}): RepaymentRule {
   return {
     id: newId(),
     amount: 5000,
@@ -60,7 +50,7 @@ export function newRepayment(
     mode: "term",
     enabled: true,
     ...overrides,
-  }
+  };
 }
 
 /**
@@ -146,5 +136,5 @@ export function defaultScenario(): Scenario {
     ],
     comfortPct: 35,
     wealth: { cash: 20_000, investments: 0, debtBalance: 0 },
-  }
+  };
 }

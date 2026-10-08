@@ -1,16 +1,15 @@
-import { z } from "zod"
+import { z } from "zod";
 
-import { EARLY_REPAYMENT_FEE_PCT } from "@/lib/finance/rules"
+import { EARLY_REPAYMENT_FEE_PCT } from "@/lib/finance/rules";
 
-const amount = () =>
-  z.number({ error: "Enter a number" }).min(0, { error: "Must be 0 or more" })
+const amount = () => z.number({ error: "Enter a number" }).min(0, { error: "Must be 0 or more" });
 const between = (min: number, max: number) =>
   z
     .number({ error: "Enter a number" })
     .min(min, { error: `Must be between ${min} and ${max}` })
-    .max(max, { error: `Must be between ${min} and ${max}` })
-const rate = () => between(-5, 30)
-const year = () => between(1, 40)
+    .max(max, { error: `Must be between ${min} and ${max}` });
+const rate = () => between(-5, 30);
+const year = () => between(1, 40);
 
 export const borrowerSchema = z.object({
   id: z.string(),
@@ -21,7 +20,7 @@ export const borrowerSchema = z.object({
   benefitsCountedPct: between(0, 100),
   raisePct: between(-20, 50),
   enabled: z.boolean(),
-})
+});
 
 export const offerSchema = z.object({
   id: z.string(),
@@ -38,7 +37,7 @@ export const offerSchema = z.object({
   repaymentFeeFixedPct: between(0, EARLY_REPAYMENT_FEE_PCT.fixed),
   repaymentFeeVariablePct: between(0, EARLY_REPAYMENT_FEE_PCT.variable),
   enabled: z.boolean(),
-})
+});
 
 export const repaymentSchema = z
   .object({
@@ -54,7 +53,7 @@ export const repaymentSchema = z
   .refine((r) => !r.repeats || r.untilYear >= r.fromYear, {
     error: "Must be the same as or after the first year",
     path: ["untilYear"],
-  })
+  });
 
 export const scenarioSchema = z.object({
   borrowers: z.array(borrowerSchema).min(1),
@@ -83,6 +82,6 @@ export const scenarioSchema = z.object({
     investments: amount(),
     debtBalance: amount(),
   }),
-})
+});
 
-export type ScenarioInput = z.input<typeof scenarioSchema>
+export type ScenarioInput = z.input<typeof scenarioSchema>;
