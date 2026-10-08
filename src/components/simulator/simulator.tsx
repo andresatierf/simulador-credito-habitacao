@@ -82,7 +82,7 @@ export function Simulator() {
           <DeadlineAlert result={result} />
           <SummaryStats result={result} maxDstiPct={scenario.market.maxDstiPct} />
           <ComparisonTable result={result} />
-          <RepaymentsSection form={form} result={result} />
+          <RepaymentsSection form={form} result={result} scenario={scenario} />
           <PaymentChart
             result={result}
             borrowers={scenario.borrowers}

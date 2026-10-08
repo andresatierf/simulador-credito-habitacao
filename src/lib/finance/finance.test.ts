@@ -3,8 +3,10 @@ import { describe, expect, it } from "vitest"
 import { defaultScenario, newOffer, newRepayment } from "@/lib/scenario/defaults"
 
 import { monthlyPayment } from "./annuity"
+import { comfortableFromYear } from "./comfort"
 import { evaluateScenario } from "./evaluate"
 import { countedIncome, projectedIncome } from "./income"
+import { suggestRepaymentPlan } from "./plan"
 import { MACROPRUDENTIAL } from "./rules"
 import { buildSchedule } from "./schedule"
 import { maxLoanFor, stressedPayment } from "./stress"
@@ -202,5 +204,52 @@ describe("evaluateScenario", () => {
 
   it("sums planned repayments within the term", () => {
     expect(result.plannedRepayments).toBe(4 * 3000 + 35 * 5000)
+  })
+})
+
+describe("suggestRepaymentPlan", () => {
+  const scenario = defaultScenario()
+  const fixed = scenario.offers[0]
+  const comfortableFrom = (plan: ReturnType<typeof suggestRepaymentPlan>) =>
+    comfortableFromYear(plan!.schedule, scenario.borrowers, scenario.comfortPct, scenario.otherDebtMonthly)
+
+  it("lowers the payment until it is comfortable, then shortens the term", () => {
+    const plan = suggestRepaymentPlan(scenario, fixed, 5000, 2)!
+    expect(plan.switchYear).not.toBeNull()
+    const [lower, shorten] = plan.rules
+    expect(lower).toMatchObject({ mode: "payment", fromYear: 2, untilYear: plan.switchYear! - 1 })
+    expect(shorten).toMatchObject({ mode: "term", fromYear: plan.switchYear, untilYear: 40 })
+    expect(comfortableFrom(plan)).toBeLessThanOrEqual(plan.switchYear!)
+  })
+
+  it("picks the earliest switch that keeps the payment comfortable", () => {
+    const plan = suggestRepaymentPlan(scenario, fixed, 5000, 2)!
+    const earlier = buildSchedule(fixed, 350_000, 480, scenario.market, {
+      repayments: [
+        newRepayment({ amount: 5000, repeats: true, fromYear: 2, untilYear: plan.switchYear! - 2, mode: "payment" }),
+        newRepayment({ amount: 5000, repeats: true, fromYear: plan.switchYear! - 1, untilYear: 40, mode: "term" }),
+      ],
+    })
+    const earlierComfortable = comfortableFromYear(earlier, scenario.borrowers, scenario.comfortPct, 0)
+    expect(earlierComfortable == null || earlierComfortable > plan.switchYear! - 1).toBe(true)
+  })
+
+  it("shortens the term from the start when the payment is already comfortable", () => {
+    const plan = suggestRepaymentPlan({ ...scenario, comfortPct: 45 }, fixed, 5000, 1)!
+    expect(plan.switchYear).toBe(1)
+    expect(plan.rules).toHaveLength(1)
+    expect(plan.rules[0]).toMatchObject({ mode: "term", fromYear: 1, untilYear: 40 })
+  })
+
+  it("only lowers the payment when it never becomes comfortable", () => {
+    const flat = { ...scenario, comfortPct: 10, borrowers: scenario.borrowers.map((b) => ({ ...b, raisePct: 0 })) }
+    const plan = suggestRepaymentPlan(flat, fixed, 500, 2)!
+    expect(plan.switchYear).toBeNull()
+    expect(plan.rules).toEqual([expect.objectContaining({ mode: "payment", fromYear: 2, untilYear: 40 })])
+  })
+
+  it("returns nothing without an amount or outside the term", () => {
+    expect(suggestRepaymentPlan(scenario, fixed, 0, 2)).toBeNull()
+    expect(suggestRepaymentPlan(scenario, fixed, 5000, 41)).toBeNull()
   })
 })

@@ -12,12 +12,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { duration, eur, pct, signedEur } from "@/lib/format"
 import type { OfferResult, ScenarioResult } from "@/lib/finance/evaluate"
 import { projectedIncome } from "@/lib/finance/income"
-import type { Borrower, RepaymentRule } from "@/lib/finance/types"
+import type { Borrower, RepaymentRule, Scenario } from "@/lib/finance/types"
 import { newId, newRepayment } from "@/lib/scenario/defaults"
 import { useScenarioStore } from "@/lib/scenario/store"
 
 import { ListItem } from "./list-item"
 import { NumCell } from "./num-cell"
+import { PlanDialog } from "./plan-dialog"
 import { SeriesKey } from "./series"
 
 const MODE_OPTIONS = [
@@ -94,8 +95,8 @@ function SwitchVerdict({
 
 export const RepaymentsSection = withForm({
   ...scenarioFormOptions,
-  props: { result: undefined as unknown as ScenarioResult },
-  render: function RepaymentsSection({ form, result }) {
+  props: { result: undefined as unknown as ScenarioResult, scenario: undefined as unknown as Scenario },
+  render: function RepaymentsSection({ form, result, scenario }) {
     const rules = useStore(form.store, (s) => s.values.repayments)
     const borrowers = useStore(form.store, (s) => s.values.borrowers)
     const comfortPct = useStore(form.store, (s) => s.values.comfortPct)
@@ -119,7 +120,12 @@ export const RepaymentsSection = withForm({
                   ? `${eur(result.plannedRepayments)} planned in total, if the loan lasts long enough.`
                   : "No repayments planned. Add one to see its effect."}
               </CardDescription>
-              <CardAction>
+              <CardAction className="flex flex-wrap justify-end gap-2">
+                <PlanDialog
+                  scenario={scenario}
+                  result={result}
+                  onApply={(planned) => form.setFieldValue("repayments", planned.map((r) => ({ ...r, id: newId() })))}
+                />
                 <Button
                   onClick={() => {
                     const lastYear = rules.reduce((max, r) => Math.max(max, r.repeats ? r.untilYear : r.fromYear), 0)
