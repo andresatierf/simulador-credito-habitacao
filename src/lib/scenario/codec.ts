@@ -1,4 +1,7 @@
-import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from "lz-string"
+import {
+  compressToEncodedURIComponent,
+  decompressFromEncodedURIComponent,
+} from "lz-string"
 
 import { EARLY_REPAYMENT_FEE_PCT } from "@/lib/finance/rules"
 import type { Scenario } from "@/lib/finance/types"
@@ -25,8 +28,12 @@ function migrate(raw: unknown): unknown {
     // Before per-offer fees there was one switch; a waived fee becomes 0% on every offer.
     offers: Array.isArray(s.offers)
       ? (s.offers as Array<Record<string, unknown>>).map((o) => ({
-          repaymentFeeFixedPct: s.repaymentFeeWaived ? 0 : EARLY_REPAYMENT_FEE_PCT.fixed,
-          repaymentFeeVariablePct: s.repaymentFeeWaived ? 0 : EARLY_REPAYMENT_FEE_PCT.variable,
+          repaymentFeeFixedPct: s.repaymentFeeWaived
+            ? 0
+            : EARLY_REPAYMENT_FEE_PCT.fixed,
+          repaymentFeeVariablePct: s.repaymentFeeWaived
+            ? 0
+            : EARLY_REPAYMENT_FEE_PCT.variable,
           ...o,
         }))
       : s.offers,
@@ -42,13 +49,19 @@ function withIds(s: Scenario): Scenario {
   }
 }
 
+function strip<T extends { id: string }>(item: T): Omit<T, "id"> {
+  const copy: Partial<T> = { ...item }
+  delete copy.id
+  return copy as Omit<T, "id">
+}
+
 function withoutIds(s: Scenario): unknown {
-  const strip = <T extends { id: string }>(item: T): Omit<T, "id"> => {
-    const copy: Partial<T> = { ...item }
-    delete copy.id
-    return copy as Omit<T, "id">
+  return {
+    ...s,
+    borrowers: s.borrowers.map(strip),
+    offers: s.offers.map(strip),
+    repayments: s.repayments.map(strip),
   }
-  return { ...s, borrowers: s.borrowers.map(strip), offers: s.offers.map(strip), repayments: s.repayments.map(strip) }
 }
 
 /** Parse untrusted scenario data (URL, storage). Returns null when it can't be used. */
@@ -57,9 +70,15 @@ export function parseScenario(raw: unknown): Scenario | null {
   if (!migrated) return null
   const withTempIds = {
     ...migrated,
-    borrowers: (migrated.borrowers as Array<Record<string, unknown>> | undefined)?.map((b) => ({ id: "", ...b })),
-    offers: (migrated.offers as Array<Record<string, unknown>> | undefined)?.map((o) => ({ id: "", ...o })),
-    repayments: (migrated.repayments as Array<Record<string, unknown>> | undefined)?.map((r) => ({ id: "", ...r })),
+    borrowers: (
+      migrated.borrowers as Array<Record<string, unknown>> | undefined
+    )?.map((b) => ({ id: "", ...b })),
+    offers: (
+      migrated.offers as Array<Record<string, unknown>> | undefined
+    )?.map((o) => ({ id: "", ...o })),
+    repayments: (
+      migrated.repayments as Array<Record<string, unknown>> | undefined
+    )?.map((r) => ({ id: "", ...r })),
   }
   const result = scenarioSchema.safeParse(withTempIds)
   return result.success ? withIds(result.data as Scenario) : null

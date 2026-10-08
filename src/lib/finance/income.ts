@@ -14,8 +14,9 @@ export function projectedIncome(borrowers: Borrower[], year: number): number {
   return activeBorrowers(borrowers).reduce(
     (sum, b) =>
       sum +
-      ((b.netPerPayment * b.paymentsPerYear) / 12) * (1 + b.raisePct / 100) ** (year - 1) +
+      ((b.netPerPayment * b.paymentsPerYear) / 12) *
+        (1 + b.raisePct / 100) ** (year - 1) +
       (b.benefitsMonthly * b.benefitsCountedPct) / 100,
-    0,
+    0
   )
 }

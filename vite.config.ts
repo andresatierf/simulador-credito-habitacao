@@ -18,7 +18,8 @@ export default defineConfig({
       manifest: {
         name: "Simulador Crédito Habitação",
         short_name: "Crédito Habitação",
-        description: "Compare Portuguese mortgage offers against the bank affordability test.",
+        description:
+          "Compare Portuguese mortgage offers against the bank affordability test.",
         theme_color: "#1f4fa8",
         background_color: "#f3f5f9",
         display: "standalone",

@@ -7,7 +7,8 @@
 export const MACROPRUDENTIAL = {
   maxDstiPct: 45,
   /** Interest rate shock by loan term. */
-  shockPp: (termYears: number) => (termYears <= 5 ? 0.5 : termYears <= 10 ? 1 : 1.5),
+  shockPp: (termYears: number) =>
+    termYears <= 5 ? 0.5 : termYears <= 10 ? 1 : 1.5,
   maxTermYears: (allBuyersUnder35: boolean) => (allBuyersUnder35 ? 40 : 35),
   maxLtvWithoutGuaranteePct: 90,
 } as const
@@ -27,7 +28,9 @@ export const YOUTH_TAX_EXEMPTION = {
 } as const
 
 /** 2026 IMT table for own permanent housing (habitação própria e permanente): [upper bound, rate, deduction]. */
-export const IMT_OWN_HOME_2026: ReadonlyArray<readonly [number, number, number]> = [
+export const IMT_OWN_HOME_2026: ReadonlyArray<
+  readonly [number, number, number]
+> = [
   [106_346, 0, 0],
   [145_470, 0.02, 2_126.92],
   [198_347, 0.05, 6_491.02],

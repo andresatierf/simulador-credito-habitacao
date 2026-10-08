@@ -18,7 +18,10 @@ export interface PurchaseTaxes {
  * IMT and stamp duty on the purchase. Buyers aged 35 or under buying a first home are exempt up to the first threshold;
  * between the thresholds they pay 8% IMT and 0.8% stamp duty on the excess only; above the second threshold no exemption applies.
  */
-export function purchaseTaxes(price: number, youthEligible: boolean): PurchaseTaxes {
+export function purchaseTaxes(
+  price: number,
+  youthEligible: boolean
+): PurchaseTaxes {
   if (youthEligible && price <= YOUTH_TAX_EXEMPTION.partialUpTo) {
     const excess = Math.max(price - YOUTH_TAX_EXEMPTION.fullUpTo, 0)
     return {
@@ -27,9 +30,18 @@ export function purchaseTaxes(price: number, youthEligible: boolean): PurchaseTa
       youthExemptionApplied: true,
     }
   }
-  return { imt: imtOwnHome(price), stampDutyPurchase: price * STAMP_DUTY.purchaseRate, youthExemptionApplied: false }
+  return {
+    imt: imtOwnHome(price),
+    stampDutyPurchase: price * STAMP_DUTY.purchaseRate,
+    youthExemptionApplied: false,
+  }
 }
 
 export function loanStampDuty(loan: number, termYears: number): number {
-  return loan * (termYears >= 5 ? STAMP_DUTY.loanRateLongTerm : STAMP_DUTY.loanRateShortTerm)
+  return (
+    loan *
+    (termYears >= 5
+      ? STAMP_DUTY.loanRateLongTerm
+      : STAMP_DUTY.loanRateShortTerm)
+  )
 }

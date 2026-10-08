@@ -1,4 +1,9 @@
-import { createRootRoute, createRoute, createRouter, Outlet } from "@tanstack/react-router"
+import {
+  createRootRoute,
+  createRoute,
+  createRouter,
+  Outlet,
+} from "@tanstack/react-router"
 import { z } from "zod"
 
 import { Simulator } from "@/components/simulator/simulator"

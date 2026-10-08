@@ -18,7 +18,12 @@ import { OffersSection } from "./offers-section"
 import { PaymentChart } from "./payment-chart"
 import { PropertySection } from "./property-section"
 import { RepaymentsSection } from "./repayments-section"
-import { CashAtSigning, ComparisonTable, DeadlineAlert, SummaryStats } from "./results"
+import {
+  CashAtSigning,
+  ComparisonTable,
+  DeadlineAlert,
+  SummaryStats,
+} from "./results"
 import { WealthSection } from "./wealth-section"
 
 /** A link wins over the saved draft; the draft wins over the defaults. */
@@ -44,7 +49,9 @@ export function Simulator() {
   const showRepaymentsInChart = useScenarioStore((s) => s.showRepaymentsInChart)
   // The form re-applies its options on every render, so replacing the scenario must change these defaults too;
   // `form.reset(next)` alone is undone on the next render.
-  const [defaults, setDefaults] = React.useState(() => initialScenario(search.s))
+  const [defaults, setDefaults] = React.useState(() =>
+    initialScenario(search.s)
+  )
 
   const form = useAppForm({ ...scenarioFormOptions, defaultValues: defaults })
   const values = useStore(form.store, (s) => s.values)
@@ -58,7 +65,11 @@ export function Simulator() {
     const timer = setTimeout(() => {
       setDraft(scenario)
       // Keep the reader where they are: by default every navigation scrolls to the top.
-      void navigate({ search: { s: encodeScenario(scenario) }, replace: true, resetScroll: false })
+      void navigate({
+        search: { s: encodeScenario(scenario) },
+        replace: true,
+        resetScroll: false,
+      })
     }, 400)
     return () => clearTimeout(timer)
   }, [scenario, setDraft, navigate])
@@ -69,7 +80,7 @@ export function Simulator() {
       form.reset(next)
       toast.add({ title: message })
     },
-    [form],
+    [form]
   )
 
   return (
@@ -89,7 +100,10 @@ export function Simulator() {
         </div>
         <div className="flex min-w-0 flex-col gap-4">
           <DeadlineAlert result={result} />
-          <SummaryStats result={result} maxDstiPct={scenario.market.maxDstiPct} />
+          <SummaryStats
+            result={result}
+            maxDstiPct={scenario.market.maxDstiPct}
+          />
           <ComparisonTable result={result} />
           <RepaymentsSection form={form} result={result} scenario={scenario} />
           <PaymentChart

@@ -10,16 +10,24 @@ export function comfortableFromYear(
   schedule: Schedule,
   borrowers: Borrower[],
   comfortPct: number,
-  otherDebtMonthly: number,
+  otherDebtMonthly: number
 ): number | null {
   const years = Math.ceil(schedule.paidOffMonths / 12)
   let from: number | null = null
   for (let year = years; year >= 1; year--) {
     let highest = 0
-    for (let m = (year - 1) * 12; m < Math.min(year * 12, schedule.paidOffMonths); m++) {
+    for (
+      let m = (year - 1) * 12;
+      m < Math.min(year * 12, schedule.paidOffMonths);
+      m++
+    ) {
       highest = Math.max(highest, schedule.payments[m])
     }
-    if (highest + otherDebtMonthly > (projectedIncome(borrowers, year) * comfortPct) / 100) break
+    if (
+      highest + otherDebtMonthly >
+      (projectedIncome(borrowers, year) * comfortPct) / 100
+    )
+      break
     from = year
   }
   return from

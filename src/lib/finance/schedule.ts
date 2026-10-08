@@ -22,7 +22,10 @@ export interface Schedule {
   paymentAfterRepayments: number | null
 }
 
-export function indexRatePct(offer: Pick<Offer, "index">, market: Market): number {
+export function indexRatePct(
+  offer: Pick<Offer, "index">,
+  market: Market
+): number {
   return offer.index === "12m" ? market.euribor12mPct : market.euribor6mPct
 }
 
@@ -36,10 +39,15 @@ export function rateAt(offer: Offer, market: Market, m: number): number {
   const later = today + market.euriborDriftPp
   if (offer.type === "fixed") return offer.fixedRatePct
   if (offer.type === "mixed") {
-    return m < Math.round(offer.fixedYears * 12) ? offer.fixedRatePct : later + offer.spreadPct
+    return m < Math.round(offer.fixedYears * 12)
+      ? offer.fixedRatePct
+      : later + offer.spreadPct
   }
   const index = m < resetMonths(offer) ? today : later
-  const spread = m < Math.round(offer.promoYears * 12) ? offer.promoSpreadPct : offer.spreadPct
+  const spread =
+    m < Math.round(offer.promoYears * 12)
+      ? offer.promoSpreadPct
+      : offer.spreadPct
   return index + spread
 }
 
@@ -54,7 +62,11 @@ export function ruleDueInYear(rule: RepaymentRule, year: number): boolean {
   if (!rule.enabled || !(rule.amount > 0)) return false
   if (!rule.repeats) return year === rule.fromYear
   const every = Math.max(1, Math.round(rule.everyYears || 1))
-  return year >= rule.fromYear && year <= rule.untilYear && (year - rule.fromYear) % every === 0
+  return (
+    year >= rule.fromYear &&
+    year <= rule.untilYear &&
+    (year - rule.fromYear) % every === 0
+  )
 }
 
 export interface ScheduleOptions {
@@ -70,10 +82,10 @@ export function buildSchedule(
   principal: number,
   months: number,
   market: Market,
-  options: ScheduleOptions = {},
+  options: ScheduleOptions = {}
 ): Schedule {
   const rules = options.repayments ?? []
-  const payments = new Array<number>(months).fill(0)
+  const payments = Array.from({ length: months }, () => 0)
   let balance = principal
   let currentRate: number | null = null
   let payment = 0
@@ -105,8 +117,11 @@ export function buildSchedule(
       balance -= extra
       extraPaid += extra
       lastRepaymentMonth = m
-      const feePct = isFixedAt(offer, m) ? offer.repaymentFeeFixedPct : offer.repaymentFeeVariablePct
-      repaymentFees += ((extra * feePct) / 100) * (1 + STAMP_DUTY.onInterestRate)
+      const feePct = isFixedAt(offer, m)
+        ? offer.repaymentFeeFixedPct
+        : offer.repaymentFeeVariablePct
+      repaymentFees +=
+        ((extra * feePct) / 100) * (1 + STAMP_DUTY.onInterestRate)
       if (balance <= EPSILON) break
       if (rule.mode === "term") {
         end = Math.min(m + 1 + monthsToRepay(rate, balance, payment), months)
@@ -129,9 +144,12 @@ export function buildSchedule(
     repaymentFees,
     extraPaid,
     firstPayment: payments[0] ?? 0,
-    paymentAfterIntro: introEnd != null && introEnd < paidOffMonths ? payments[introEnd] : null,
+    paymentAfterIntro:
+      introEnd != null && introEnd < paidOffMonths ? payments[introEnd] : null,
     paymentAfterRepayments:
-      lastRepaymentMonth >= 0 && lastRepaymentMonth + 1 < paidOffMonths ? payments[lastRepaymentMonth + 1] : null,
+      lastRepaymentMonth >= 0 && lastRepaymentMonth + 1 < paidOffMonths
+        ? payments[lastRepaymentMonth + 1]
+        : null,
   }
 }
 

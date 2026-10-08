@@ -10,7 +10,8 @@ Everything runs in the browser. There is no server and no data leaves the device
 bun install
 bun run dev        # http://localhost:5173
 bun run test       # finance tests (Vitest)
-bun run lint
+bun run lint       # oxlint
+bun run format     # oxfmt
 bun run build      # static site in dist/, installable as a PWA
 ```
 

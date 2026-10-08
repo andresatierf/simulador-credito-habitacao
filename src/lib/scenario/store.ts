@@ -32,12 +32,21 @@ export const useScenarioStore = create<ScenarioStore>()(
       showRepaymentsInChart: false,
       setDraft: (draft) => set({ draft }),
       saveScenario: (name, scenario) => {
-        const entry: SavedScenario = { id: newId(), name, savedAt: new Date().toISOString(), scenario }
-        set((state) => ({ saved: [entry, ...state.saved.filter((s) => s.name !== name)] }))
+        const entry: SavedScenario = {
+          id: newId(),
+          name,
+          savedAt: new Date().toISOString(),
+          scenario,
+        }
+        set((state) => ({
+          saved: [entry, ...state.saved.filter((s) => s.name !== name)],
+        }))
         return entry
       },
-      deleteScenario: (id) => set((state) => ({ saved: state.saved.filter((s) => s.id !== id) })),
-      setShowRepaymentsInChart: (showRepaymentsInChart) => set({ showRepaymentsInChart }),
+      deleteScenario: (id) =>
+        set((state) => ({ saved: state.saved.filter((s) => s.id !== id) })),
+      setShowRepaymentsInChart: (showRepaymentsInChart) =>
+        set({ showRepaymentsInChart }),
     }),
     {
       name: "simulador-credito-habitacao",
@@ -56,6 +65,6 @@ export const useScenarioStore = create<ScenarioStore>()(
           showRepaymentsInChart: p.showRepaymentsInChart ?? false,
         }
       },
-    },
-  ),
+    }
+  )
 )

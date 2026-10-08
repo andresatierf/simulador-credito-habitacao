@@ -6,7 +6,7 @@ Client-only React app (Vite, TypeScript, TanStack Router + Form, Zustand, Zod, s
 
 - `bun run test` — Vitest; run after any change in `src/lib/finance/`.
 - `bunx tsc -p tsconfig.app.json --noEmit` — type check.
-- `bun run lint`, `bun run build`.
+- `bun run lint` (oxlint), `bun run format` (oxfmt; CI runs `format:check`), `bun run build`.
 
 ## Rules
 

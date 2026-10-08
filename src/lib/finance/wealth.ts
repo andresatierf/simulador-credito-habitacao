@@ -29,12 +29,20 @@ export function wealthAtStart({
   const purchaseCosts = cashAtSigning - property.downPayment
   const cashAfterSigning = wealth.cash - cashAtSigning
   const homeValue = property.valuation || property.price
-  const netWorthAfter = cashAfterSigning + wealth.investments - wealth.debtBalance + homeValue - loan
+  const netWorthAfter =
+    cashAfterSigning +
+    wealth.investments -
+    wealth.debtBalance +
+    homeValue -
+    loan
   return {
     netWorthBefore,
     purchaseCosts,
     cashAfterSigning,
     netWorthAfter,
-    reserveMonths: monthlyOutgoings > 0 ? Math.max(cashAfterSigning, 0) / monthlyOutgoings : null,
+    reserveMonths:
+      monthlyOutgoings > 0
+        ? Math.max(cashAfterSigning, 0) / monthlyOutgoings
+        : null,
   }
 }

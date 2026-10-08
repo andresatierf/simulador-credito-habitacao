@@ -1,11 +1,19 @@
 import { EARLY_REPAYMENT_FEE_PCT } from "@/lib/finance/rules"
-import type { Borrower, Offer, RepaymentRule, Scenario } from "@/lib/finance/types"
+import type {
+  Borrower,
+  Offer,
+  RepaymentRule,
+  Scenario,
+} from "@/lib/finance/types"
 
 export function newId(): string {
   return crypto.randomUUID()
 }
 
-export function newBorrower(name: string, overrides: Partial<Borrower> = {}): Borrower {
+export function newBorrower(
+  name: string,
+  overrides: Partial<Borrower> = {}
+): Borrower {
   return {
     id: newId(),
     name,
@@ -39,7 +47,9 @@ export function newOffer(name: string, overrides: Partial<Offer> = {}): Offer {
   }
 }
 
-export function newRepayment(overrides: Partial<RepaymentRule> = {}): RepaymentRule {
+export function newRepayment(
+  overrides: Partial<RepaymentRule> = {}
+): RepaymentRule {
   return {
     id: newId(),
     amount: 5000,
@@ -81,16 +91,58 @@ export function defaultScenario(): Scenario {
       stressShockPp: 1.5,
     },
     offers: [
-      newOffer("Bankinter · fixed", { type: "fixed", fixedRatePct: 3.45, index: "12m", spreadPct: 0.7 }),
-      newOffer("BPI · fixed", { type: "fixed", fixedRatePct: 4.05, spreadPct: 0.6 }),
-      newOffer("BPI · variable", { type: "variable", spreadPct: 0.6, promoSpreadPct: 0.6, promoYears: 0 }),
-      newOffer("Santander · variable promo", { type: "variable", spreadPct: 0.8, promoSpreadPct: 0.5, promoYears: 3 }),
-      newOffer("Bankinter · mixed 2y", { type: "mixed", fixedRatePct: 2.5, fixedYears: 2, index: "12m", spreadPct: 0.7 }),
-      newOffer("Santander · mixed 4y", { type: "mixed", fixedRatePct: 2.8, fixedYears: 4, spreadPct: 0.8 }),
+      newOffer("Bankinter · fixed", {
+        type: "fixed",
+        fixedRatePct: 3.45,
+        index: "12m",
+        spreadPct: 0.7,
+      }),
+      newOffer("BPI · fixed", {
+        type: "fixed",
+        fixedRatePct: 4.05,
+        spreadPct: 0.6,
+      }),
+      newOffer("BPI · variable", {
+        type: "variable",
+        spreadPct: 0.6,
+        promoSpreadPct: 0.6,
+        promoYears: 0,
+      }),
+      newOffer("Santander · variable promo", {
+        type: "variable",
+        spreadPct: 0.8,
+        promoSpreadPct: 0.5,
+        promoYears: 3,
+      }),
+      newOffer("Bankinter · mixed 2y", {
+        type: "mixed",
+        fixedRatePct: 2.5,
+        fixedYears: 2,
+        index: "12m",
+        spreadPct: 0.7,
+      }),
+      newOffer("Santander · mixed 4y", {
+        type: "mixed",
+        fixedRatePct: 2.8,
+        fixedYears: 4,
+        spreadPct: 0.8,
+      }),
     ],
     repayments: [
-      newRepayment({ amount: 3000, repeats: true, fromYear: 2, untilYear: 5, mode: "payment" }),
-      newRepayment({ amount: 5000, repeats: true, fromYear: 6, untilYear: 40, mode: "term" }),
+      newRepayment({
+        amount: 3000,
+        repeats: true,
+        fromYear: 2,
+        untilYear: 5,
+        mode: "payment",
+      }),
+      newRepayment({
+        amount: 5000,
+        repeats: true,
+        fromYear: 6,
+        untilYear: 40,
+        mode: "term",
+      }),
     ],
     comfortPct: 35,
     wealth: { cash: 20_000, investments: 0, debtBalance: 0 },

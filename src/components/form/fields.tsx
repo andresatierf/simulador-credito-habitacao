@@ -1,10 +1,29 @@
 import type * as React from "react"
 
 import { Checkbox } from "@/components/ui/checkbox"
-import { Field, FieldContent, FieldDescription, FieldError, FieldLabel, FieldTitle } from "@/components/ui/field"
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+  FieldTitle,
+} from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from "@/components/ui/input-group"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from "@/components/ui/input-group"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
@@ -53,7 +72,11 @@ export function NumberField({
           max={max}
           value={Number.isFinite(value) ? value : ""}
           onBlur={field.handleBlur}
-          onChange={(e) => field.handleChange(e.target.value === "" ? Number.NaN : e.target.valueAsNumber)}
+          onChange={(e) =>
+            field.handleChange(
+              e.target.value === "" ? Number.NaN : e.target.valueAsNumber
+            )
+          }
           aria-invalid={isInvalid}
           className="tabular-nums"
         />
@@ -69,7 +92,12 @@ export function NumberField({
   )
 }
 
-export function TextField({ label, description, className, srOnlyLabel }: BaseProps & { srOnlyLabel?: boolean }) {
+export function TextField({
+  label,
+  description,
+  className,
+  srOnlyLabel,
+}: BaseProps & { srOnlyLabel?: boolean }) {
   const { field, id, isInvalid } = useFieldState<string>()
   return (
     <Field data-invalid={isInvalid} className={className}>
@@ -108,9 +136,16 @@ export function SelectField<T extends string | number>({
       <Select
         items={options}
         value={field.state.value}
-        onValueChange={(value) => value != null && field.handleChange(value as T)}
+        onValueChange={(value) =>
+          value != null && field.handleChange(value as T)
+        }
       >
-        <SelectTrigger id={id} aria-invalid={isInvalid} className="w-full" onBlur={field.handleBlur}>
+        <SelectTrigger
+          id={id}
+          aria-invalid={isInvalid}
+          className="w-full"
+          onBlur={field.handleBlur}
+        >
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -143,12 +178,18 @@ export function ToggleGroupField<T extends string>({
         variant="outline"
         spacing={0}
         value={[field.state.value]}
-        onValueChange={(values) => values[0] && field.handleChange(values[0] as T)}
+        onValueChange={(values) =>
+          values[0] && field.handleChange(values[0] as T)
+        }
         aria-label={typeof label === "string" ? label : undefined}
         className="w-full"
       >
         {options.map((option) => (
-          <ToggleGroupItem key={option.value} value={option.value} className="flex-1">
+          <ToggleGroupItem
+            key={option.value}
+            value={option.value}
+            className="flex-1"
+          >
             {option.label}
           </ToggleGroupItem>
         ))}
@@ -166,7 +207,11 @@ export function SwitchField({ label, description, className }: BaseProps) {
         <FieldLabel htmlFor={id}>{label}</FieldLabel>
         {description && <FieldDescription>{description}</FieldDescription>}
       </FieldContent>
-      <Switch id={id} checked={field.state.value} onCheckedChange={(checked) => field.handleChange(checked)} />
+      <Switch
+        id={id}
+        checked={field.state.value}
+        onCheckedChange={(checked) => field.handleChange(checked)}
+      />
     </Field>
   )
 }
@@ -175,7 +220,11 @@ export function CheckboxField({ label, description, className }: BaseProps) {
   const { field, id } = useFieldState<boolean>()
   return (
     <Field orientation="horizontal" className={className}>
-      <Checkbox id={id} checked={field.state.value} onCheckedChange={(checked) => field.handleChange(checked)} />
+      <Checkbox
+        id={id}
+        checked={field.state.value}
+        onCheckedChange={(checked) => field.handleChange(checked)}
+      />
       <FieldContent>
         <FieldLabel htmlFor={id}>{label}</FieldLabel>
         {description && <FieldDescription>{description}</FieldDescription>}
@@ -192,13 +241,20 @@ export function SliderField({
   max,
   step,
   format,
-}: BaseProps & { min: number; max: number; step: number; format: (value: number) => string }) {
+}: BaseProps & {
+  min: number
+  max: number
+  step: number
+  format: (value: number) => string
+}) {
   const { field, id } = useFieldState<number>()
   return (
     <Field className={className}>
       <div className="flex items-baseline justify-between gap-2">
         <FieldLabel htmlFor={id}>{label}</FieldLabel>
-        <span className="font-mono text-xs tabular-nums text-muted-foreground">{format(field.state.value)}</span>
+        <span className="font-mono text-xs text-muted-foreground tabular-nums">
+          {format(field.state.value)}
+        </span>
       </div>
       <Slider
         id={id}
@@ -206,7 +262,9 @@ export function SliderField({
         max={max}
         step={step}
         value={[field.state.value]}
-        onValueChange={(value) => field.handleChange(Array.isArray(value) ? value[0] : value)}
+        onValueChange={(value) =>
+          field.handleChange(Array.isArray(value) ? value[0] : value)
+        }
       />
       {description && <FieldDescription>{description}</FieldDescription>}
     </Field>
@@ -229,7 +287,9 @@ export function BooleanToggleField({
         variant="outline"
         spacing={0}
         value={[field.state.value ? "true" : "false"]}
-        onValueChange={(values) => values[0] && field.handleChange(values[0] === "true")}
+        onValueChange={(values) =>
+          values[0] && field.handleChange(values[0] === "true")
+        }
         aria-label={typeof label === "string" ? label : undefined}
         className="w-full"
       >
