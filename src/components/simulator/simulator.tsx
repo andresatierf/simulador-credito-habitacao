@@ -19,6 +19,7 @@ import { PaymentChart } from "./payment-chart"
 import { PropertySection } from "./property-section"
 import { RepaymentsSection } from "./repayments-section"
 import { CashAtSigning, ComparisonTable, DeadlineAlert, SummaryStats } from "./results"
+import { WealthSection } from "./wealth-section"
 
 /** A link wins over the saved draft; the draft wins over the defaults. */
 function initialScenario(linked: string | undefined): Scenario {
@@ -77,6 +78,7 @@ export function Simulator() {
           <PropertySection form={form} result={result} />
           <MarketSection form={form} />
           <CashAtSigning result={result} scenario={scenario} />
+          <WealthSection form={form} result={result} />
         </div>
         <div className="flex min-w-0 flex-col gap-4">
           <DeadlineAlert result={result} />

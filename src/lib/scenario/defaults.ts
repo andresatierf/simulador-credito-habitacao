@@ -91,5 +91,6 @@ export function defaultScenario(): Scenario {
     ],
     repaymentFeeWaived: false,
     comfortPct: 35,
+    wealth: { cash: 20_000, investments: 0, debtBalance: 0 },
   }
 }

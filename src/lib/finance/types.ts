@@ -81,6 +81,15 @@ export interface Market {
   stressShockPp: number
 }
 
+export interface Wealth {
+  /** Cash, current and savings accounts, term deposits. */
+  cash: number
+  /** Funds, shares, PPR and other investments. */
+  investments: number
+  /** Outstanding balances of other loans (car, personal credit, cards). */
+  debtBalance: number
+}
+
 export interface Scenario {
   borrowers: Borrower[]
   /** Other loan payments per month (car, cards, personal credit). */
@@ -92,4 +101,6 @@ export interface Scenario {
   repaymentFeeWaived: boolean
   /** Payment share of income considered comfortable, used for the switch check. */
   comfortPct: number
+  /** What the household owns and owes before buying. */
+  wealth: Wealth
 }

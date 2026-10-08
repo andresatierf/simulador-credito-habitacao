@@ -20,6 +20,7 @@ function migrate(raw: unknown): unknown {
     ...s,
     property: { ...base.property, ...(s.property as object) },
     market: { ...base.market, ...(s.market as object) },
+    wealth: { ...base.wealth, ...(s.wealth as object) },
   }
 }
 

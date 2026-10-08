@@ -253,3 +253,43 @@ describe("suggestRepaymentPlan", () => {
     expect(suggestRepaymentPlan(scenario, fixed, 5000, 41)).toBeNull()
   })
 })
+
+describe("net worth at the start", () => {
+  // Defaults: €20,000 cash; €350k bought at valuation, 100% financed.
+  // Due at signing: IMT €1,556.88 + purchase stamp duty €155.69 + loan stamp duty €2,100 + bank fees €1,000 + other €800.
+  const due = 1556.88 + 155.69 + 2100 + 1000 + 800
+
+  it("keeps what's left after signing and how long it lasts", () => {
+    const { wealth } = evaluateScenario(defaultScenario())
+    expect(wealth.netWorthBefore).toBe(20_000)
+    expect(wealth.purchaseCosts).toBeCloseTo(due, 1)
+    expect(wealth.cashAfterSigning).toBeCloseTo(20_000 - due, 1)
+    // Bankinter fixed: €1,345 payment + €60 insurance a month.
+    expect(wealth.reserveMonths).toBeCloseTo((20_000 - due) / (monthlyPayment(3.45, 480, 350_000) + 60), 4)
+  })
+
+  it("lowers net worth by the purchase costs, not by the down payment", () => {
+    const scenario = defaultScenario()
+    scenario.wealth = { cash: 80_000, investments: 10_000, debtBalance: 5_000 }
+    scenario.property.downPayment = 50_000
+    const { wealth, cashAtSigning } = evaluateScenario(scenario)
+    expect(wealth.netWorthBefore).toBe(85_000)
+    expect(wealth.cashAfterSigning).toBeCloseTo(80_000 - cashAtSigning, 6)
+    expect(wealth.netWorthAfter).toBeCloseTo(85_000 - wealth.purchaseCosts, 6)
+  })
+
+  it("counts a valuation above the price as equity", () => {
+    const scenario = defaultScenario()
+    scenario.property.valuation = 360_000
+    const { wealth } = evaluateScenario(scenario)
+    expect(wealth.netWorthAfter).toBeCloseTo(wealth.netWorthBefore - wealth.purchaseCosts + 10_000, 6)
+  })
+
+  it("shows a shortfall when savings don't cover the cash due", () => {
+    const scenario = defaultScenario()
+    scenario.wealth.cash = 2_000
+    const { wealth } = evaluateScenario(scenario)
+    expect(wealth.cashAfterSigning).toBeLessThan(0)
+    expect(wealth.reserveMonths).toBe(0)
+  })
+})

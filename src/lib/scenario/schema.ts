@@ -75,6 +75,11 @@ export const scenarioSchema = z.object({
   repayments: z.array(repaymentSchema),
   repaymentFeeWaived: z.boolean(),
   comfortPct: between(5, 80),
+  wealth: z.object({
+    cash: amount(),
+    investments: amount(),
+    debtBalance: amount(),
+  }),
 })
 
 export type ScenarioInput = z.input<typeof scenarioSchema>

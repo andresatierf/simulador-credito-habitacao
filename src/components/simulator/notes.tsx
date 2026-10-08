@@ -47,6 +47,10 @@ export function Notes() {
             The switch year is the first year from which every payment plus other debts stays at or below the
             comfortable share of income, on the cheapest offer that passes the bank test.
           </li>
+          <li>
+            Net worth: cash and investments minus other debts. After buying, the home counts at the bank valuation minus
+            the loan; taxes and fees are spent, while the down payment becomes equity.
+          </li>
           <li>Max term under Recomendação 1/2026: 40 years if every buyer is 35 or under, otherwise 35.</li>
           <li>
             Sources:{" "}

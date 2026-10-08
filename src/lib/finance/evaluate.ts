@@ -4,6 +4,7 @@ import { MACROPRUDENTIAL, STAMP_DUTY, YOUTH_GUARANTEE } from "./rules"
 import { buildSchedule, totalPaid, type Schedule } from "./schedule"
 import { maxLoanFor, stressedPayment } from "./stress"
 import { loanStampDuty, purchaseTaxes } from "./taxes"
+import { wealthAtStart, type WealthResult } from "./wealth"
 import type { Offer, Scenario } from "./types"
 
 export interface OfferResult {
@@ -54,6 +55,8 @@ export interface ScenarioResult {
   /** Cash needed at signing, using the bank fees of the best offer. */
   cashAtSigning: number
   plannedRepayments: number
+  /** Net worth before and right after buying, using the best offer (or the first shown) for the monthly outgoings. */
+  wealth: WealthResult
 }
 
 function costOf(schedule: Schedule, offer: Offer, loanStamp: number, insuredMonths: number): number {
@@ -145,6 +148,17 @@ export function evaluateScenario(scenario: Scenario): ScenarioResult {
     (best?.offer.feesOneOff ?? 0) +
     property.otherClosingCosts
 
+  const reference = best ?? shown[0] ?? null
+  const wealth = wealthAtStart({
+    wealth: scenario.wealth,
+    property,
+    loan,
+    cashAtSigning,
+    monthlyOutgoings: reference
+      ? reference.schedule.firstPayment + reference.offer.insuranceMonthly + otherDebtMonthly
+      : otherDebtMonthly,
+  })
+
   return {
     income,
     maxPayment,
@@ -164,5 +178,6 @@ export function evaluateScenario(scenario: Scenario): ScenarioResult {
     bestWithRepayments,
     cashAtSigning,
     plannedRepayments: plannedRepaymentTotal(scenario, Math.floor(months / 12)),
+    wealth,
   }
 }
