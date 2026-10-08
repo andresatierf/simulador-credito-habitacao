@@ -42,9 +42,11 @@ export function Simulator() {
   const navigate = useNavigate({ from: "/" })
   const setDraft = useScenarioStore((s) => s.setDraft)
   const showRepaymentsInChart = useScenarioStore((s) => s.showRepaymentsInChart)
-  const [initial] = React.useState(() => initialScenario(search.s))
+  // The form re-applies its options on every render, so replacing the scenario must change these defaults too;
+  // `form.reset(next)` alone is undone on the next render.
+  const [defaults, setDefaults] = React.useState(() => initialScenario(search.s))
 
-  const form = useAppForm({ ...scenarioFormOptions, defaultValues: initial })
+  const form = useAppForm({ ...scenarioFormOptions, defaultValues: defaults })
   const values = useStore(form.store, (s) => s.values)
   const isValid = useStore(form.store, (s) => s.isValid)
   const scenario = useLastValid(values, isValid)
@@ -61,17 +63,22 @@ export function Simulator() {
     return () => clearTimeout(timer)
   }, [scenario, setDraft, navigate])
 
-  const load = React.useCallback(
-    (next: Scenario) => {
+  const replaceScenario = React.useCallback(
+    (next: Scenario, message: string) => {
+      setDefaults(next)
       form.reset(next)
-      toast.add({ title: "Scenario loaded" })
+      toast.add({ title: message })
     },
     [form],
   )
 
   return (
     <div className="mx-auto flex max-w-[1440px] flex-col gap-6 px-4 py-7 sm:px-6">
-      <AppHeader getScenario={() => scenario} onLoad={load} onReset={() => form.reset(defaultScenario())} />
+      <AppHeader
+        getScenario={() => scenario}
+        onLoad={(next) => replaceScenario(next, "Scenario loaded")}
+        onReset={() => replaceScenario(defaultScenario(), "Reset to defaults")}
+      />
       <div className="grid items-start gap-5 min-[960px]:grid-cols-[minmax(400px,440px)_minmax(0,1fr)]">
         <div className="flex min-w-0 flex-col gap-4">
           <BorrowersSection form={form} result={result} />
