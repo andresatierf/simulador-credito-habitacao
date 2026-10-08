@@ -54,7 +54,8 @@ export function Simulator() {
   React.useEffect(() => {
     const timer = setTimeout(() => {
       setDraft(scenario)
-      void navigate({ search: { s: encodeScenario(scenario) }, replace: true })
+      // Keep the reader where they are: by default every navigation scrolls to the top.
+      void navigate({ search: { s: encodeScenario(scenario) }, replace: true, resetScroll: false })
     }, 400)
     return () => clearTimeout(timer)
   }, [scenario, setDraft, navigate])
